@@ -335,6 +335,8 @@ public class SaturationBar extends View {
             dimen = event.getY();
         }
 
+        boolean refreshColor = false;
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 mIsMovingPointer = true;
@@ -343,8 +345,7 @@ public class SaturationBar extends View {
                         && dimen <= (mBarPointerHaloRadius + mBarLength)) {
                     mBarPointerPosition = Math.round(dimen);
                     calculateColor(Math.round(dimen));
-                    mBarPointerPaint.setColor(mColor);
-                    invalidate();
+                    refreshColor = true;
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -354,33 +355,15 @@ public class SaturationBar extends View {
                             && dimen <= (mBarPointerHaloRadius + mBarLength)) {
                         mBarPointerPosition = Math.round(dimen);
                         calculateColor(Math.round(dimen));
-                        mBarPointerPaint.setColor(mColor);
-                        if (mPicker != null) {
-                            mColor = mPicker.changeValueBarColor(mColor);
-                            mColor = mPicker.changeOpacityBarColor(mColor);
-                            mPicker.setNewCenterColor(mColor);
-                        }
-                        invalidate();
+                        refreshColor = true;
                     } else if (dimen < mBarPointerHaloRadius) {
                         mBarPointerPosition = mBarPointerHaloRadius;
                         mColor = Color.WHITE;
-                        mBarPointerPaint.setColor(mColor);
-                        if (mPicker != null) {
-                            mColor = mPicker.changeValueBarColor(mColor);
-                            mColor = mPicker.changeOpacityBarColor(mColor);
-                            mPicker.setNewCenterColor(mColor);
-                        }
-                        invalidate();
+                        refreshColor = true;
                     } else if (dimen > (mBarPointerHaloRadius + mBarLength)) {
                         mBarPointerPosition = mBarPointerHaloRadius + mBarLength;
                         mColor = Color.HSVToColor(mHSVColor);
-                        mBarPointerPaint.setColor(mColor);
-                        if (mPicker != null) {
-                            mColor = mPicker.changeValueBarColor(mColor);
-                            mColor = mPicker.changeOpacityBarColor(mColor);
-                            mPicker.setNewCenterColor(mColor);
-                        }
-                        invalidate();
+                        refreshColor = true;
                     }
                 }
                 if (onSaturationChangedListener != null && oldChangedListenerSaturation != mColor) {
@@ -392,6 +375,17 @@ public class SaturationBar extends View {
                 mIsMovingPointer = false;
                 break;
         }
+
+        if (refreshColor) {
+            mBarPointerPaint.setColor(mColor);
+            if (mPicker != null) {
+                mColor = mPicker.changeValueBarColor(mColor);
+                mColor = mPicker.changeOpacityBarColor(mColor);
+                mPicker.setNewCenterColor(mColor);
+            }
+            invalidate();
+        }
+
         return true;
     }
 

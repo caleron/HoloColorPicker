@@ -588,6 +588,9 @@ public class ColorPicker extends View {
                         && Math.sqrt(x * x + y * y) >= mColorWheelRadius - mColorPointerHaloRadius
                         && mTouchAnywhereOnColorWheelEnabled) {
                     mUserIsMovingPointer = true;
+
+                    refreshCenterColor(x, y);
+
                     invalidate();
                 }
                 // If user did not press pointer or center, report event not handled
@@ -598,28 +601,7 @@ public class ColorPicker extends View {
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (mUserIsMovingPointer) {
-                    mAngle = (float) Math.atan2(y - mSlopY, x - mSlopX);
-                    mPointerColor.setColor(calculateColor(mAngle));
-
-                    mCenterNewColor = calculateColor(mAngle);
-
-                    if (mOpacityBar != null) {
-                        mColor = mOpacityBar.setColor(mColor);
-                    }
-
-                    if (mValueBar != null) {
-                        mColor = mValueBar.setColor(mColor);
-                    }
-
-                    if (mSaturationBar != null) {
-                        mColor = mSaturationBar.setColor(mColor);
-                    }
-
-                    if (mSVbar != null) {
-                        mColor = mSVbar.setColor(mColor);
-                    }
-
-                    setNewCenterColor(mColor);
+                    refreshCenterColor(x, y);
 
                     invalidate();
                 }
@@ -648,6 +630,31 @@ public class ColorPicker extends View {
                 break;
         }
         return true;
+    }
+
+    private void refreshCenterColor(float x, float y) {
+        mAngle = (float) Math.atan2(y - mSlopY, x - mSlopX);
+        mPointerColor.setColor(calculateColor(mAngle));
+
+        mCenterNewColor = calculateColor(mAngle);
+
+        if (mOpacityBar != null) {
+            mColor = mOpacityBar.setColor(mColor);
+        }
+
+        if (mValueBar != null) {
+            mColor = mValueBar.setColor(mColor);
+        }
+
+        if (mSaturationBar != null) {
+            mColor = mSaturationBar.setColor(mColor);
+        }
+
+        if (mSVbar != null) {
+            mColor = mSVbar.setColor(mColor);
+        }
+
+        setNewCenterColor(mColor);
     }
 
     /**

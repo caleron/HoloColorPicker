@@ -332,6 +332,7 @@ public class OpacityBar extends View {
         } else {
             dimen = event.getY();
         }
+        boolean refreshColor = false;
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -341,8 +342,7 @@ public class OpacityBar extends View {
                         && dimen <= (mBarPointerHaloRadius + mBarLength)) {
                     mBarPointerPosition = Math.round(dimen);
                     calculateColor(Math.round(dimen));
-                    mBarPointerPaint.setColor(mColor);
-                    invalidate();
+                    refreshColor = true;
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -352,27 +352,15 @@ public class OpacityBar extends View {
                             && dimen <= (mBarPointerHaloRadius + mBarLength)) {
                         mBarPointerPosition = Math.round(dimen);
                         calculateColor(Math.round(dimen));
-                        mBarPointerPaint.setColor(mColor);
-                        if (mPicker != null) {
-                            mPicker.setNewCenterColor(mColor);
-                        }
-                        invalidate();
+                        refreshColor = true;
                     } else if (dimen < mBarPointerHaloRadius) {
                         mBarPointerPosition = mBarPointerHaloRadius;
                         mColor = Color.TRANSPARENT;
-                        mBarPointerPaint.setColor(mColor);
-                        if (mPicker != null) {
-                            mPicker.setNewCenterColor(mColor);
-                        }
-                        invalidate();
+                        refreshColor = true;
                     } else if (dimen > (mBarPointerHaloRadius + mBarLength)) {
                         mBarPointerPosition = mBarPointerHaloRadius + mBarLength;
                         mColor = Color.HSVToColor(mHSVColor);
-                        mBarPointerPaint.setColor(mColor);
-                        if (mPicker != null) {
-                            mPicker.setNewCenterColor(mColor);
-                        }
-                        invalidate();
+                        refreshColor = true;
                     }
                 }
                 if (onOpacityChangedListener != null && oldChangedListenerOpacity != getOpacity()) {
@@ -384,6 +372,15 @@ public class OpacityBar extends View {
                 mIsMovingPointer = false;
                 break;
         }
+
+        if (refreshColor) {
+            mBarPointerPaint.setColor(mColor);
+            if (mPicker != null) {
+                mPicker.setNewCenterColor(mColor);
+            }
+            invalidate();
+        }
+
         return true;
     }
 

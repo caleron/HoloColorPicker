@@ -497,6 +497,21 @@ public class ColorPicker extends View {
      *              true for shades of grey. You have been warned!
      */
     public void setColor(int color) {
+        setColor(color, false);
+    }
+
+    /**
+     * Set the color to be highlighted by the pointer. If the
+     * instances {@code SVBar} and the {@code OpacityBar} aren't null the color
+     * will also be set to them
+     *
+     * @param color The RGB value of the color to highlight. If this is not a
+     *              color displayed on the color wheel a very simple algorithm is
+     *              used to map it to the color wheel. The resulting color often
+     *              won't look close to the original color. This is especially
+     *              true for shades of grey. You have been warned!
+     */
+    void setColor(int color, boolean fromUser) {
         mAngle = colorToAngle(color);
         mPointerColor.setColor(calculateColor(mAngle));
 
@@ -504,7 +519,7 @@ public class ColorPicker extends View {
         if (mOpacityBar != null) {
             // set the value of the opacity
             mOpacityBar.setColor(mColor);
-            mOpacityBar.setOpacity(Color.alpha(color));
+            mOpacityBar.setOpacity(Color.alpha(color), fromUser);
         }
 
         // check if the instance isn't null
@@ -517,27 +532,27 @@ public class ColorPicker extends View {
             // we can only use Saturation or Value every time.
             // Here will be checked which we shall use.
             if (mHSV[1] < mHSV[2]) {
-                mSVbar.setSaturation(mHSV[1]);
+                mSVbar.setSaturation(mHSV[1], fromUser);
             } else if (mHSV[1] > mHSV[2]) {
-                mSVbar.setValue(mHSV[2]);
+                mSVbar.setValue(mHSV[2], fromUser);
             }
         }
 
         if (mSaturationBar != null) {
             Color.colorToHSV(color, mHSV);
             mSaturationBar.setColor(mColor);
-            mSaturationBar.setSaturation(mHSV[1]);
+            mSaturationBar.setSaturation(mHSV[1], fromUser);
         }
 
         if (mValueBar != null && mSaturationBar == null) {
             Color.colorToHSV(color, mHSV);
             mValueBar.setColor(mColor);
-            mValueBar.setValue(mHSV[2]);
+            mValueBar.setValue(mHSV[2], fromUser);
         } else if (mValueBar != null) {
             Color.colorToHSV(color, mHSV);
-            mValueBar.setValue(mHSV[2]);
+            mValueBar.setValue(mHSV[2], fromUser);
         }
-        setNewCenterColor(color);
+        setNewCenterColor(color, fromUser);
     }
 
     /**
@@ -580,7 +595,7 @@ public class ColorPicker extends View {
                         && y >= -mColorCenterRadius && y <= mColorCenterRadius
                         && mShowCenterOldColor) {
                     mCenterHaloPaint.setAlpha(0x50);
-                    setColor(getOldCenterColor());
+                    setColor(getOldCenterColor(), true);
                     invalidate();
                 }
                 // Check whether the user pressed anywhere on the wheel.
@@ -616,7 +631,7 @@ public class ColorPicker extends View {
                 mCenterHaloPaint.setAlpha(0x00);
 
                 if (onColorSelectedListener != null && mCenterNewColor != oldSelectedListenerColor) {
-                    onColorSelectedListener.onColorSelected(mCenterNewColor);
+                    onColorSelectedListener.onColorSelected(mCenterNewColor, true);
                     oldSelectedListenerColor = mCenterNewColor;
                 }
 
@@ -624,7 +639,7 @@ public class ColorPicker extends View {
                 break;
             case MotionEvent.ACTION_CANCEL:
                 if (onColorSelectedListener != null && mCenterNewColor != oldSelectedListenerColor) {
-                    onColorSelectedListener.onColorSelected(mCenterNewColor);
+                    onColorSelectedListener.onColorSelected(mCenterNewColor, true);
                     oldSelectedListenerColor = mCenterNewColor;
                 }
                 break;
@@ -654,7 +669,7 @@ public class ColorPicker extends View {
             mColor = mSVbar.setColor(mColor);
         }
 
-        setNewCenterColor(mColor);
+        setNewCenterColor(mColor, true);
     }
 
     /**
@@ -713,7 +728,7 @@ public class ColorPicker extends View {
      *
      * @param color int of the color.
      */
-    public void setNewCenterColor(int color) {
+    public void setNewCenterColor(int color, boolean fromUser) {
         mCenterNewColor = color;
         mCenterNewPaint.setColor(color);
         if (mCenterOldColor == 0) {
@@ -721,7 +736,7 @@ public class ColorPicker extends View {
             mCenterOldPaint.setColor(color);
         }
         if (onColorChangedListener != null && color != oldChangedListenerColor) {
-            onColorChangedListener.onColorChanged(color);
+            onColorChangedListener.onColorChanged(color, fromUser);
             oldChangedListenerColor = color;
         }
         invalidate();
@@ -854,7 +869,7 @@ public class ColorPicker extends View {
         mShowCenterOldColor = savedState.getBoolean(STATE_SHOW_OLD_COLOR);
         int currentColor = calculateColor(mAngle);
         mPointerColor.setColor(currentColor);
-        setNewCenterColor(currentColor);
+        setNewCenterColor(currentColor, false);
     }
 
     public void setTouchAnywhereOnColorWheelEnabled(boolean TouchAnywhereOnColorWheelEnabled) {
@@ -872,7 +887,7 @@ public class ColorPicker extends View {
      * @author lars
      */
     public interface OnColorChangedListener {
-        public void onColorChanged(int color);
+        void onColorChanged(int color, boolean fromUser);
     }
 
     /**
@@ -880,6 +895,6 @@ public class ColorPicker extends View {
      * Currently it is always called when the color wheel has been released.
      */
     public interface OnColorSelectedListener {
-        public void onColorSelected(int color);
+        void onColorSelected(int color, boolean fromUser);
     }
 }

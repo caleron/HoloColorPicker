@@ -381,7 +381,7 @@ public class SaturationBar extends View {
             if (mPicker != null) {
                 mColor = mPicker.changeValueBarColor(mColor);
                 mColor = mPicker.changeOpacityBarColor(mColor);
-                mPicker.setNewCenterColor(mColor);
+                mPicker.setNewCenterColor(mColor, true);
             }
             invalidate();
         }
@@ -425,7 +425,7 @@ public class SaturationBar extends View {
      *
      * @param saturation float between 0 and 1
      */
-    public void setSaturation(float saturation) {
+    public void setSaturation(float saturation, boolean fromUser) {
         mBarPointerPosition = Math.round((mSatToPosFactor * saturation))
                 + mBarPointerHaloRadius;
         calculateColor(mBarPointerPosition);
@@ -434,7 +434,7 @@ public class SaturationBar extends View {
         if (mPicker != null) {
             mColor = mPicker.changeValueBarColor(mColor);
             mColor = mPicker.changeOpacityBarColor(mColor);
-            mPicker.setNewCenterColor(mColor);
+            mPicker.setNewCenterColor(mColor, fromUser);
         }
         invalidate();
     }
@@ -500,7 +500,7 @@ public class SaturationBar extends View {
         super.onRestoreInstanceState(superState);
 
         setColor(Color.HSVToColor(savedState.getFloatArray(STATE_COLOR)));
-        setSaturation(savedState.getFloat(STATE_SATURATION));
+        setSaturation(savedState.getFloat(STATE_SATURATION), false);
     }
 
     public interface OnSaturationChangedListener {

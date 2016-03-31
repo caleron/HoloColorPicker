@@ -380,7 +380,7 @@ public class ValueBar extends View {
             mBarPointerPaint.setColor(mColor);
             if (mPicker != null) {
                 mColor = mPicker.changeOpacityBarColor(mColor);
-                mPicker.setNewCenterColor(mColor);
+                mPicker.setNewCenterColor(mColor, true);
             }
             invalidate();
         }
@@ -422,7 +422,7 @@ public class ValueBar extends View {
      *
      * @param value float between 0 and 1
      */
-    public void setValue(float value) {
+    public void setValue(float value, boolean fromUser) {
         mBarPointerPosition = Math
                 .round((mBarLength - (mSatToPosFactor * value))
                         + mBarPointerHaloRadius);
@@ -430,7 +430,7 @@ public class ValueBar extends View {
         mBarPointerPaint.setColor(mColor);
         if (mPicker != null) {
             mColor = mPicker.changeOpacityBarColor(mColor);
-            mPicker.setNewCenterColor(mColor);
+            mPicker.setNewCenterColor(mColor, fromUser);
         }
         invalidate();
     }
@@ -497,7 +497,7 @@ public class ValueBar extends View {
         super.onRestoreInstanceState(superState);
 
         setColor(Color.HSVToColor(savedState.getFloatArray(STATE_COLOR)));
-        setValue(savedState.getFloat(STATE_VALUE));
+        setValue(savedState.getFloat(STATE_VALUE), false);
     }
 
     public interface OnValueChangedListener {

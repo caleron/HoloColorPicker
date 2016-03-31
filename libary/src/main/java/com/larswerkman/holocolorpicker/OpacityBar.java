@@ -376,7 +376,7 @@ public class OpacityBar extends View {
         if (refreshColor) {
             mBarPointerPaint.setColor(mColor);
             if (mPicker != null) {
-                mPicker.setNewCenterColor(mColor);
+                mPicker.setNewCenterColor(mColor, true);
             }
             invalidate();
         }
@@ -438,13 +438,13 @@ public class OpacityBar extends View {
      *
      * @param opacity float between 0 and 255
      */
-    public void setOpacity(int opacity) {
+    public void setOpacity(int opacity, boolean fromUser) {
         mBarPointerPosition = Math.round((mOpacToPosFactor * opacity))
                 + mBarPointerHaloRadius;
         calculateColor(mBarPointerPosition);
         mBarPointerPaint.setColor(mColor);
         if (mPicker != null) {
-            mPicker.setNewCenterColor(mColor);
+            mPicker.setNewCenterColor(mColor, fromUser);
         }
         invalidate();
     }
@@ -514,10 +514,10 @@ public class OpacityBar extends View {
         super.onRestoreInstanceState(superState);
 
         setColor(Color.HSVToColor(savedState.getFloatArray(STATE_COLOR)));
-        setOpacity(savedState.getInt(STATE_OPACITY));
+        setOpacity(savedState.getInt(STATE_OPACITY), false);
     }
 
     public interface OnOpacityChangedListener {
-        public void onOpacityChanged(int opacity);
+        void onOpacityChanged(int opacity);
     }
 }

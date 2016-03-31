@@ -363,7 +363,7 @@ public class SVBar extends View {
             mBarPointerPaint.setColor(mColor);
             if (mPicker != null) {
                 mColor = mPicker.changeOpacityBarColor(mColor);
-                mPicker.setNewCenterColor(mColor);
+                mPicker.setNewCenterColor(mColor, true);
             }
             invalidate();
         }
@@ -376,7 +376,7 @@ public class SVBar extends View {
      *
      * @param saturation float between 0 and 1
      */
-    public void setSaturation(float saturation) {
+    public void setSaturation(float saturation, boolean fromUser) {
         mBarPointerPosition = Math.round((mSVToPosFactor * saturation)
                 + mBarPointerHaloRadius);
         calculateColor(mBarPointerPosition);
@@ -385,7 +385,7 @@ public class SVBar extends View {
         // wheel
         if (mPicker != null) {
             mColor = mPicker.changeOpacityBarColor(mColor);
-            mPicker.setNewCenterColor(mColor);
+            mPicker.setNewCenterColor(mColor, fromUser);
         }
         invalidate();
     }
@@ -395,7 +395,7 @@ public class SVBar extends View {
      *
      * @param value float between 0 and 1
      */
-    public void setValue(float value) {
+    public void setValue(float value, boolean fromUser) {
         mBarPointerPosition = Math.round((mSVToPosFactor * (1 - value))
                 + mBarPointerHaloRadius + (mBarLength / 2));
         calculateColor(mBarPointerPosition);
@@ -404,7 +404,7 @@ public class SVBar extends View {
         // wheel
         if (mPicker != null) {
             mColor = mPicker.changeOpacityBarColor(mColor);
-            mPicker.setNewCenterColor(mColor);
+            mPicker.setNewCenterColor(mColor, fromUser);
         }
         invalidate();
     }
@@ -513,9 +513,9 @@ public class SVBar extends View {
 
         setColor(Color.HSVToColor(savedState.getFloatArray(STATE_COLOR)));
         if (savedState.containsKey(STATE_SATURATION)) {
-            setSaturation(savedState.getFloat(STATE_SATURATION));
+            setSaturation(savedState.getFloat(STATE_SATURATION), false);
         } else {
-            setValue(savedState.getFloat(STATE_VALUE));
+            setValue(savedState.getFloat(STATE_VALUE), false);
         }
     }
 }
